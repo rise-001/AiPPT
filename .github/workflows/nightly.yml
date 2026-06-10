@@ -1,9 +1,7 @@
 name: Nightly
 
-# Every day at 03:00 UTC, or manual trigger
+# Manual trigger only.
 on:
-  schedule:
-    - cron: '0 3 * * *'
   workflow_dispatch:
 
 concurrency:

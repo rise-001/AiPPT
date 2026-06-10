@@ -1,12 +1,7 @@
 name: CI Tests
 
-# Push to main/develop (excluding docs-only changes) or manual trigger
+# Manual trigger only.
 on:
-  push:
-    branches: [ main, develop ]
-    paths-ignore:
-      - '**/*.md'
-      - 'docs/**'
   workflow_dispatch:
 
 concurrency:

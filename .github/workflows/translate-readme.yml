@@ -3,11 +3,6 @@ name: Auto Translate README
 # 当主分支的 README.md 改动时自动翻译到 README_EN.md
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'README.md'
   workflow_dispatch:  # 允许手动触发
 
 # 防止多个翻译任务同时运行
