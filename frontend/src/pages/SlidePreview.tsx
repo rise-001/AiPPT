@@ -305,6 +305,8 @@ const VIDEO_VOICE_OPTIONS = [
   ]},
 ];
 
+const EDITABLE_PPTX_EXPORT_DISABLED = true;
+
 const NARRATION_PERSONA_OPTIONS = [
   { value: 'charismatic keynote speaker', zh: '演讲家', en: 'Keynote speaker' },
   { value: 'knowledgeable and patient university professor', zh: '大学教授', en: 'University professor' },
@@ -1698,12 +1700,14 @@ export const SlidePreview: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
+                    if (EDITABLE_PPTX_EXPORT_DISABLED) return;
                     setShowExportMenu(false);
                     setEditablePptxDialogIconTransparent(currentProject?.enable_icon_subject_extraction ?? true);
                     setShowEditablePptxDialog(true);
                   }}
-                  disabled={!hasAllImages}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-background-hover transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                  disabled={!hasAllImages || EDITABLE_PPTX_EXPORT_DISABLED}
+                  title={EDITABLE_PPTX_EXPORT_DISABLED ? '暂时不可用' : undefined}
+                  className="w-full px-4 py-2 text-left transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-gray-50 dark:enabled:hover:bg-background-hover"
                 >
                   {t('preview.exportEditablePptx')}
                 </button>
