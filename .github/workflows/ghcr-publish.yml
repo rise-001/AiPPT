@@ -1,11 +1,14 @@
 name: Build and Push Docker Image
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Docker tag to publish'
-        required: true
+        description: 'Docker tag to publish (default: latest)'
+        required: false
         default: latest
         type: string
 
@@ -14,12 +17,13 @@ permissions:
   packages: write
 
 concurrency:
-  group: ghcr-publish-${{ inputs.tag }}
+  group: ghcr-publish-${{ github.ref }}
   cancel-in-progress: false
 
 env:
   REGISTRY: ghcr.io
   OWNER: rise-001
+  IMAGE_NAME: aippt
 
 jobs:
   publish:
@@ -42,6 +46,28 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Resolve image tags
+        id: meta
+        shell: bash
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            {
+              echo "tags<<EOF"
+              echo "${REGISTRY}/${OWNER}/${IMAGE_NAME}:latest"
+              echo "${REGISTRY}/${OWNER}/${IMAGE_NAME}:sha-${GITHUB_SHA::7}"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "version=latest" >> "$GITHUB_OUTPUT"
+          else
+            TAG="${{ inputs.tag }}"
+            {
+              echo "tags<<EOF"
+              echo "${REGISTRY}/${OWNER}/${IMAGE_NAME}:${TAG}"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "version=${TAG}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build and push all-in-one image
         uses: docker/build-push-action@v6
         with:
@@ -49,40 +75,9 @@ jobs:
           file: ./Dockerfile.allinone
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/aippt:${{ inputs.tag }}
+          tags: ${{ steps.meta.outputs.tags }}
           build-args: |
             GHCR_REGISTRY=ghcr.io/
             APP_COMMIT_SHA=${{ github.sha }}
             APP_COMMIT_SHORT_SHA=${{ github.sha }}
-            APP_VERSION_TAG=${{ inputs.tag }}
-
-      - name: Build and push backend image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./backend/Dockerfile
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/aippt-backend:${{ inputs.tag }}
-          build-args: |
-            GHCR_REGISTRY=ghcr.io/
-            APP_COMMIT_SHA=${{ github.sha }}
-            APP_COMMIT_SHORT_SHA=${{ github.sha }}
-            APP_VERSION_TAG=${{ inputs.tag }}
-
-      - name: Build and push frontend image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./frontend/Dockerfile
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.OWNER }}/aippt-frontend:${{ inputs.tag }}
-          build-args: |
-            DOCKER_BUILDKIT=1
-            APP_COMMIT_SHA=${{ github.sha }}
-            APP_COMMIT_SHORT_SHA=${{ github.sha }}
-            APP_VERSION_TAG=${{ inputs.tag }}
+            APP_VERSION_TAG=${{ steps.meta.outputs.version }}
