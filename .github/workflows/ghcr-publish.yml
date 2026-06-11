@@ -1,4 +1,4 @@
-name: Publish GHCR Images
+name: Build and Push Docker Image
 
 on:
   workflow_dispatch:
@@ -23,7 +23,7 @@ env:
 
 jobs:
   publish:
-    name: Build and publish Docker images
+    name: Build and push Docker image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
