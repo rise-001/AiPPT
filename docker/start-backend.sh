@@ -2,5 +2,6 @@
 set -e
 
 cd /app
-uv run --directory backend alembic upgrade head
-exec uv run --directory backend python app.py
+cd /app/backend
+/app/.venv/bin/alembic upgrade head
+exec /app/.venv/bin/python app.py

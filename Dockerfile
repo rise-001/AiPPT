@@ -1,7 +1,7 @@
-# Canonical all-in-one production image.
+# Default production Dockerfile.
 #
-# This image builds the Vite frontend, serves it with nginx, and runs the
-# Flask backend behind the same port through supervisor.
+# Keep this file in sync with Dockerfile.allinone. It exists so a plain
+# `docker build .` creates the single-container image that most users want.
 
 ARG DOCKER_REGISTRY=
 ARG GHCR_REGISTRY=ghcr.io/
