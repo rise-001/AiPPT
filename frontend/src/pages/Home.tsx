@@ -24,7 +24,7 @@ const homeI18n = {
   zh: {
     nav: {
       materialGenerate: '素材生成', materialCenter: '素材中心',
-      history: '历史项目', settings: '设置', help: '帮助'
+      history: '历史项目', settings: '设置', help: '快速配置'
     },
     settings: {
       language: { label: '界面语言' },
@@ -100,7 +100,7 @@ const homeI18n = {
   en: {
     nav: {
       materialGenerate: 'Generate Material', materialCenter: 'Material Center',
-      history: 'History', settings: 'Settings', help: 'Help'
+      history: 'History', settings: 'Settings', help: 'Quick Config'
     },
     settings: {
       language: { label: 'Interface Language' },
@@ -707,6 +707,25 @@ export const Home: React.FC = () => {
             </span>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
+            {/* 桌面端：带文字的快速配置按钮 */}
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={<HelpCircle size={16} className="md:w-[18px] md:h-[18px]" />}
+              onClick={() => setIsHelpModalOpen(true)}
+              className="hidden sm:inline-flex hover:bg-banana-100/60 hover:shadow-sm hover:scale-105 transition-all duration-200 font-semibold"
+            >
+              <span className="hidden md:inline">{t('nav.help')}</span>
+            </Button>
+            {/* 手机端：仅图标的快速配置按钮 */}
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={<HelpCircle size={16} />}
+              onClick={() => setIsHelpModalOpen(true)}
+              className="sm:hidden hover:bg-banana-100/60 hover:shadow-sm hover:scale-105 transition-all duration-200"
+              title={t('nav.help')}
+            />
             {/* 桌面端：带文字的素材生成按钮 */}
             <Button
               variant="ghost"
@@ -763,23 +782,6 @@ export const Home: React.FC = () => {
             >
               <span className="hidden md:inline">{t('nav.settings')}</span>
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsHelpModalOpen(true)}
-              className="hidden md:inline-flex hover:bg-banana-50/50"
-            >
-              {t('nav.help')}
-            </Button>
-            {/* 移动端帮助按钮 */}
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<HelpCircle size={16} />}
-              onClick={() => setIsHelpModalOpen(true)}
-              className="md:hidden hover:bg-banana-100/60 hover:shadow-sm hover:scale-105 transition-all duration-200"
-              title={t('nav.help')}
-            />
             {/* 分隔线 */}
             <div className="h-5 w-px bg-gray-300 dark:bg-border-primary mx-1" />
             {/* 语言切换按钮 */}

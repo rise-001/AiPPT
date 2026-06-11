@@ -46,7 +46,7 @@ class Config:
     GOOGLE_API_BASE = os.getenv('GOOGLE_API_BASE', '')
     
     # Provider format: gemini | openai | vertex | lazyllm
-    AI_PROVIDER_FORMAT = os.getenv('AI_PROVIDER_FORMAT', 'gemini')
+    AI_PROVIDER_FORMAT = os.getenv('AI_PROVIDER_FORMAT', 'openai')
 
     # Google Cloud Vertex AI (requires AI_PROVIDER_FORMAT=vertex)
     VERTEX_PROJECT_ID = os.getenv('VERTEX_PROJECT_ID', '')
@@ -72,7 +72,7 @@ class Config:
 
     # Lazyllm 格式专用配置（当 AI_PROVIDER_FORMAT=lazyllm 时使用）
     TEXT_MODEL_SOURCE = os.getenv('TEXT_MODEL_SOURCE', '')                   # 文本生成模型厂商（留空则跟随全局 AI_PROVIDER_FORMAT）
-    IMAGE_MODEL_SOURCE = os.getenv('IMAGE_MODEL_SOURCE', '')                   # 图片生成模型厂商（留空则跟随全局 AI_PROVIDER_FORMAT）
+    IMAGE_MODEL_SOURCE = os.getenv('IMAGE_MODEL_SOURCE', 'openai')             # 图片生成模型厂商（默认使用 OpenAI 格式）
     IMAGE_CAPTION_MODEL_SOURCE = os.getenv('IMAGE_CAPTION_MODEL_SOURCE', '')   # 图片识别模型厂商（留空则跟随全局 AI_PROVIDER_FORMAT）
 
     # 各模型类型的独立 API 配置（优先级高于全局配置）
@@ -88,7 +88,7 @@ class Config:
     
     # AI 模型配置
     TEXT_MODEL = os.getenv('TEXT_MODEL', 'gemini-3-flash-preview')
-    IMAGE_MODEL = os.getenv('IMAGE_MODEL', 'gemini-3-pro-image-preview')
+    IMAGE_MODEL = os.getenv('IMAGE_MODEL', 'gpt-image-2')
 
     # MinerU 文件解析服务配置
     MINERU_TOKEN = os.getenv('MINERU_TOKEN', '')

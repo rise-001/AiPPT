@@ -4,6 +4,125 @@ This project ships best as an all-in-one image: nginx serves the built frontend
 and proxies `/api`, `/files`, and `/health` to the Flask backend inside the same
 container.
 
+## Pure Docker deployment, no Compose
+
+Use this section when the server only uses `docker` commands and does not use
+`docker compose`.
+
+This deployment does not require `.env`. Start the container first, then open
+the web UI and enter only the Lingyun API Key on the Settings page. API Base URL
+defaults to `https://yunai.chat`, the text model defaults to
+`gemini-3-flash-preview`, the image model defaults to `gpt-image-2` with OpenAI
+format, and the image caption model defaults to `gemini-3-flash-preview`. These
+settings are stored in the mounted SQLite database under `backend/instance`.
+
+### Recommended all-in-one image
+
+Pull the published image:
+
+```bash
+docker pull ghcr.io/rise-001/aippt:latest
+```
+
+Create persistent data directories:
+
+```bash
+mkdir -p backend/instance uploads
+```
+
+Run the application:
+
+```bash
+docker run -d \
+  --name aippt \
+  -p 3000:80 \
+  -v "$PWD/backend/instance:/app/backend/instance" \
+  -v "$PWD/uploads:/app/uploads" \
+  --restart unless-stopped \
+  ghcr.io/rise-001/aippt:latest
+```
+
+Open `http://SERVER_IP:3000`.
+
+Check status and logs:
+
+```bash
+docker ps
+docker logs -f aippt
+docker exec aippt curl -f http://localhost/health
+```
+
+Restart:
+
+```bash
+docker restart aippt
+```
+
+Update to the latest image:
+
+```bash
+docker pull ghcr.io/rise-001/aippt:latest
+docker stop aippt
+docker rm aippt
+docker run -d \
+  --name aippt \
+  -p 3000:80 \
+  -v "$PWD/backend/instance:/app/backend/instance" \
+  -v "$PWD/uploads:/app/uploads" \
+  --restart unless-stopped \
+  ghcr.io/rise-001/aippt:latest
+```
+
+Stop and remove the container:
+
+```bash
+docker stop aippt
+docker rm aippt
+```
+
+### Split frontend and backend images
+
+Use this only when you explicitly want two containers.
+
+```bash
+docker network create aippt-network
+docker pull ghcr.io/rise-001/aippt-backend:latest
+docker pull ghcr.io/rise-001/aippt-frontend:latest
+mkdir -p backend/instance uploads
+```
+
+Run the backend:
+
+```bash
+docker run -d \
+  --name backend \
+  --network aippt-network \
+  -p 5000:5000 \
+  -p 1455:1455 \
+  -v "$PWD/backend/instance:/app/backend/instance" \
+  -v "$PWD/uploads:/app/uploads" \
+  --restart unless-stopped \
+  ghcr.io/rise-001/aippt-backend:latest
+```
+
+Run the frontend:
+
+```bash
+docker run -d \
+  --name aippt-frontend \
+  --network aippt-network \
+  -p 3000:80 \
+  --restart unless-stopped \
+  ghcr.io/rise-001/aippt-frontend:latest
+```
+
+Check logs:
+
+```bash
+docker logs -f backend
+docker logs -f aippt-frontend
+```
+
 ## Build locally
 
 ```bash
@@ -22,13 +141,13 @@ docker build \
 
 ## Run locally
 
-Create `.env` from `.env.example` and set at least your model provider API key
-and `SECRET_KEY`.
+You can run without `.env` and configure model provider settings in the web UI.
+Use `--env-file .env` only when you intentionally want environment variable
+defaults.
 
 ```bash
 docker run -d \
   --name banana-slides \
-  --env-file .env \
   -p 3000:80 \
   -v "${PWD}/backend/instance:/app/backend/instance" \
   -v "${PWD}/uploads:/app/uploads" \
@@ -66,7 +185,6 @@ Users can then run:
 ```bash
 docker run -d \
   --name banana-slides \
-  --env-file .env \
   -p 3000:80 \
   -v "${PWD}/backend/instance:/app/backend/instance" \
   -v "${PWD}/uploads:/app/uploads" \

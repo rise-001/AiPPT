@@ -13,7 +13,7 @@ const settingsI18n = {
       subtitle: "配置应用的各项参数",
       sections: {
         appearance: "外观设置", language: "界面语言", apiConfig: "默认 API 配置",
-        apiConfigDesc: "下方模型未单独指定提供商时，将使用此处的配置",
+        apiConfigDesc: "只需填写 API Key；Base URL、模型和图像提供商格式已按凌云 API 默认配置",
         modelConfig: "模型配置", mineruConfig: "MinerU 配置", imageConfig: "图像生成配置",
         performanceConfig: "性能配置", outputLanguage: "输出语言设置",
         textReasoning: "文本推理模式", imageReasoning: "图像推理模式",
@@ -68,13 +68,13 @@ const settingsI18n = {
         apiBaseUrl: "API Base URL", apiBaseUrlPlaceholder: "https://yunai.chat",
         apiBaseUrlDesc: "设置大模型提供商 API 的基础 URL",
         apiKey: "API Key", apiKeyPlaceholder: "输入新的 API Key",
-        apiKeyDesc: "留空则保持当前设置不变，输入新值则更新",
+        apiKeyDesc: "只需填写凌云 API Key；保存后会自动复用到文本、图像生成和图片识别模型",
         apiKeySet: "已设置（长度: {{length}}）",
-        textModel: "文本大模型", textModelPlaceholder: "留空使用环境变量配置 (如: gemini-3-flash-preview)",
+        textModel: "文本大模型", textModelPlaceholder: "gemini-3-flash-preview",
         textModelDesc: "用于生成大纲、描述等文本内容的模型名称",
-        imageModel: "图像生成模型", imageModelPlaceholder: "留空使用环境变量配置 (如: imagen-3.0-generate-001)",
+        imageModel: "图像生成模型", imageModelPlaceholder: "gpt-image-2",
         imageModelDesc: "用于生成页面图片的模型名称",
-        imageCaptionModel: "图片识别模型", imageCaptionModelPlaceholder: "留空使用环境变量配置 (如: gemini-3-flash-preview)",
+        imageCaptionModel: "图片识别模型", imageCaptionModelPlaceholder: "gemini-3-flash-preview",
         imageCaptionModelDesc: "用于识别参考文件中的图片并生成描述",
         mineruApiBase: "MinerU API Base", mineruApiBasePlaceholder: "留空使用环境变量配置 (如: https://mineru.net)",
         mineruApiBaseDesc: "MinerU 服务地址，用于解析参考文件",
@@ -153,7 +153,7 @@ const settingsI18n = {
       subtitle: "Configure application parameters",
       sections: {
         appearance: "Appearance", language: "Interface Language", apiConfig: "Default API Configuration",
-        apiConfigDesc: "Used as fallback when a model below has no provider specified",
+        apiConfigDesc: "Only the API Key is required; Base URL, models, and image provider format use Lingyun API defaults",
         modelConfig: "Model Configuration", mineruConfig: "MinerU Configuration", imageConfig: "Image Generation Configuration",
         performanceConfig: "Performance Configuration", outputLanguage: "Output Language Settings",
         textReasoning: "Text Reasoning Mode", imageReasoning: "Image Reasoning Mode",
@@ -208,13 +208,13 @@ const settingsI18n = {
         apiBaseUrl: "API Base URL", apiBaseUrlPlaceholder: "https://yunai.chat",
         apiBaseUrlDesc: "Set the base URL for the LLM provider API",
         apiKey: "API Key", apiKeyPlaceholder: "Enter new API Key",
-        apiKeyDesc: "Leave empty to keep current setting, enter new value to update",
+        apiKeyDesc: "Enter the Lingyun API Key once; it is reused for text, image generation, and image caption models",
         apiKeySet: "Set (length: {{length}})",
-        textModel: "Text Model", textModelPlaceholder: "Leave empty to use env config (e.g., gemini-3-flash-preview)",
+        textModel: "Text Model", textModelPlaceholder: "gemini-3-flash-preview",
         textModelDesc: "Model name for generating outlines, descriptions, etc.",
-        imageModel: "Image Generation Model", imageModelPlaceholder: "Leave empty to use env config (e.g., imagen-3.0-generate-001)",
+        imageModel: "Image Generation Model", imageModelPlaceholder: "gpt-image-2",
         imageModelDesc: "Model name for generating page images",
-        imageCaptionModel: "Image Caption Model", imageCaptionModelPlaceholder: "Leave empty to use env config (e.g., gemini-3-flash-preview)",
+        imageCaptionModel: "Image Caption Model", imageCaptionModelPlaceholder: "gemini-3-flash-preview",
         imageCaptionModelDesc: "Model for recognizing images in reference files and generating descriptions",
         mineruApiBase: "MinerU API Base", mineruApiBasePlaceholder: "Leave empty to use env config (e.g., https://mineru.net)",
         mineruApiBaseDesc: "MinerU service address for parsing reference files",
@@ -351,14 +351,21 @@ const API_KEY_PROVIDERS = new Set(['gemini', 'openai']);
 // LazyLLM 厂商名集合
 const LAZYLLM_VENDOR_SET = new Set(LAZYLLM_SOURCES.map(s => s.value));
 
+const DEFAULT_API_PROVIDER_FORMAT = 'openai';
+const DEFAULT_API_BASE_URL = 'https://yunai.chat';
+const DEFAULT_TEXT_MODEL = 'gemini-3-flash-preview';
+const DEFAULT_IMAGE_MODEL = 'gpt-image-2';
+const DEFAULT_IMAGE_CAPTION_MODEL = 'gemini-3-flash-preview';
+const DEFAULT_IMAGE_MODEL_SOURCE = 'openai';
+
 // 初始表单数据
 const initialFormData = {
-  ai_provider_format: 'gemini' as string,
-  api_base_url: '',
+  ai_provider_format: DEFAULT_API_PROVIDER_FORMAT as string,
+  api_base_url: DEFAULT_API_BASE_URL,
   api_key: '',
-  text_model: '',
-  image_model: '',
-  image_caption_model: '',
+  text_model: DEFAULT_TEXT_MODEL,
+  image_model: DEFAULT_IMAGE_MODEL,
+  image_caption_model: DEFAULT_IMAGE_CAPTION_MODEL,
   mineru_api_base: '',
   mineru_token: '',
   image_resolution: '2K',
@@ -373,7 +380,7 @@ const initialFormData = {
   baidu_api_key: '',
   // LazyLLM 配置
   text_model_source: '',
-  image_model_source: '',
+  image_model_source: DEFAULT_IMAGE_MODEL_SOURCE,
   image_caption_model_source: '',
   lazyllm_api_keys: {} as Record<string, string>,
   // Per-model API credentials (for gemini/openai per-model overrides)
@@ -560,17 +567,17 @@ export const SettingsAbout: React.FC<{ t: SettingsTranslator }> = ({ t }) => {
 };
 
 const formDataFromSettings = (data: SettingsType): typeof initialFormData => ({
-  ai_provider_format: resolveLazyllmVendor(data.ai_provider_format || 'gemini', data.lazyllm_api_keys_info),
-  api_base_url: data.api_base_url || '',
+  ai_provider_format: resolveLazyllmVendor(data.ai_provider_format || DEFAULT_API_PROVIDER_FORMAT, data.lazyllm_api_keys_info),
+  api_base_url: data.api_base_url || DEFAULT_API_BASE_URL,
   api_key: '',
   image_resolution: data.image_resolution || '2K',
   max_description_workers: data.max_description_workers || 5,
   max_image_workers: data.max_image_workers || 8,
-  text_model: data.text_model || '',
-  image_model: data.image_model || '',
+  text_model: data.text_model || DEFAULT_TEXT_MODEL,
+  image_model: data.image_model || DEFAULT_IMAGE_MODEL,
   mineru_api_base: data.mineru_api_base || '',
   mineru_token: '',
-  image_caption_model: data.image_caption_model || '',
+  image_caption_model: data.image_caption_model || DEFAULT_IMAGE_CAPTION_MODEL,
   output_language: data.output_language || 'zh',
   enable_text_reasoning: data.enable_text_reasoning || false,
   text_thinking_budget: data.text_thinking_budget || 1024,
@@ -578,7 +585,7 @@ const formDataFromSettings = (data: SettingsType): typeof initialFormData => ({
   image_thinking_budget: data.image_thinking_budget || 1024,
   baidu_api_key: '',
   text_model_source: data.text_model_source || '',
-  image_model_source: data.image_model_source || '',
+  image_model_source: data.image_model_source || DEFAULT_IMAGE_MODEL_SOURCE,
   image_caption_model_source: data.image_caption_model_source || '',
   lazyllm_api_keys: {},
   text_api_key: '',
@@ -876,7 +883,12 @@ export const Settings: React.FC = () => {
       } = formData;
       const payload: Parameters<typeof api.updateSettings>[0] = {
         ...otherData,
-        ai_provider_format: otherData.ai_provider_format,
+        ai_provider_format: otherData.ai_provider_format || DEFAULT_API_PROVIDER_FORMAT,
+        api_base_url: otherData.api_base_url || DEFAULT_API_BASE_URL,
+        text_model: otherData.text_model || DEFAULT_TEXT_MODEL,
+        image_model: otherData.image_model || DEFAULT_IMAGE_MODEL,
+        image_caption_model: otherData.image_caption_model || DEFAULT_IMAGE_CAPTION_MODEL,
+        image_model_source: otherData.image_model_source || DEFAULT_IMAGE_MODEL_SOURCE,
       };
 
       // Only send sensitive fields if user entered a new value
@@ -884,9 +896,10 @@ export const Settings: React.FC = () => {
       if (mineru_token) payload.mineru_token = mineru_token;
       if (baidu_api_key) payload.baidu_api_key = baidu_api_key;
       if (elevenlabs_api_key) payload.elevenlabs_api_key = elevenlabs_api_key;
-      if (text_api_key) payload.text_api_key = text_api_key;
-      if (image_api_key) payload.image_api_key = image_api_key;
-      if (image_caption_api_key) payload.image_caption_api_key = image_caption_api_key;
+      const sharedModelKey = api_key || '';
+      if (text_api_key || sharedModelKey) payload.text_api_key = text_api_key || sharedModelKey;
+      if (image_api_key || sharedModelKey) payload.image_api_key = image_api_key || sharedModelKey;
+      if (image_caption_api_key || sharedModelKey) payload.image_caption_api_key = image_caption_api_key || sharedModelKey;
 
       // Send lazyllm API keys (only non-empty values)
       const nonEmptyKeys = Object.fromEntries(
