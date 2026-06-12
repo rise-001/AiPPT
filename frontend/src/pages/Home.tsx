@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Sparkles, FileText, FileEdit, ImagePlus, Paperclip, Palette, Lightbulb, Search, Settings, FolderOpen, HelpCircle, Sun, Moon, Globe, Monitor, ChevronDown, Upload, RefreshCw } from 'lucide-react';
+import { Sparkles, FileText, FileEdit, Paperclip, Palette, Lightbulb, Search, HelpCircle, Sun, Moon, Globe, Monitor, ChevronDown, Upload, RefreshCw } from 'lucide-react';
 import { Button, Card, useToast, MaterialGeneratorModal, MaterialCenterModal, MaterialSelector, ReferenceFileList, ReferenceFileSelector, FilePreviewModal, HelpModal, Footer, TextStyleSelector } from '@/components/shared';
 import { MarkdownTextarea, type MarkdownTextareaRef } from '@/components/shared/MarkdownTextarea';
 import { TemplateSelector, getTemplateFile } from '@/components/shared/TemplateSelector';
@@ -252,11 +252,6 @@ export const Home: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, []);
-
-  const handleOpenMaterialModal = () => {
-    // 在主页始终生成全局素材，不关联任何项目
-    setIsMaterialModalOpen(true);
-  };
 
   const textareaRef = useRef<MarkdownTextareaRef>(null);
   const [isMaterialSelectorOpen, setIsMaterialSelectorOpen] = useState(false);
@@ -691,22 +686,22 @@ export const Home: React.FC = () => {
       </div>
 
       {/* 导航栏 */}
-      <nav className="relative z-50 h-16 md:h-18 bg-white/40 dark:bg-background-primary backdrop-blur-2xl dark:backdrop-blur-none dark:border-b dark:border-border-primary">
+      <nav className="relative z-50 h-14 sm:h-16 md:h-18 bg-white/40 dark:bg-background-primary backdrop-blur-2xl dark:backdrop-blur-none dark:border-b dark:border-border-primary">
 
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-full flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 h-full flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <div className="flex items-center">
               <img
                 src="/logo.png"
                 alt="凌云 API Logo"
-                className="h-10 md:h-12 w-auto rounded-lg object-contain"
+                className="h-8 sm:h-10 md:h-12 w-auto rounded-lg object-contain"
               />
             </div>
-            <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-banana-600 via-orange-500 to-pink-500 bg-clip-text text-transparent">
+            <span className="truncate text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-banana-600 via-orange-500 to-pink-500 bg-clip-text text-transparent">
               凌云
             </span>
           </div>
-          <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2 md:gap-3">
             {/* 桌面端：带文字的快速配置按钮 */}
             <Button
               variant="ghost"
@@ -726,62 +721,6 @@ export const Home: React.FC = () => {
               className="sm:hidden hover:bg-banana-100/60 hover:shadow-sm hover:scale-105 transition-all duration-200"
               title={t('nav.help')}
             />
-            {/* 桌面端：带文字的素材生成按钮 */}
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<ImagePlus size={16} className="md:w-[18px] md:h-[18px]" />}
-              onClick={handleOpenMaterialModal}
-              className="hidden sm:inline-flex hover:bg-banana-100/60 hover:shadow-sm hover:scale-105 transition-all duration-200 font-medium"
-            >
-              <span className="hidden md:inline">{t('nav.materialGenerate')}</span>
-            </Button>
-            {/* 手机端：仅图标的素材生成按钮 */}
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<ImagePlus size={16} />}
-              onClick={handleOpenMaterialModal}
-              className="sm:hidden hover:bg-banana-100/60 hover:shadow-sm hover:scale-105 transition-all duration-200"
-              title={t('nav.materialGenerate')}
-            />
-            {/* 桌面端：带文字的素材中心按钮 */}
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<FolderOpen size={16} className="md:w-[18px] md:h-[18px]" />}
-              onClick={() => setIsMaterialCenterOpen(true)}
-              className="hidden sm:inline-flex hover:bg-banana-100/60 hover:shadow-sm hover:scale-105 transition-all duration-200 font-medium"
-            >
-              <span className="hidden md:inline">{t('nav.materialCenter')}</span>
-            </Button>
-            {/* 手机端：仅图标的素材中心按钮 */}
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<FolderOpen size={16} />}
-              onClick={() => setIsMaterialCenterOpen(true)}
-              className="sm:hidden hover:bg-banana-100/60 hover:shadow-sm hover:scale-105 transition-all duration-200"
-              title={t('nav.materialCenter')}
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/history')}
-              className="text-xs md:text-sm hover:bg-banana-100/60 hover:shadow-sm hover:scale-105 transition-all duration-200 font-medium"
-            >
-              <span className="hidden sm:inline">{t('nav.history')}</span>
-              <span className="sm:hidden">{t('nav.history')}</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<Settings size={16} className="md:w-[18px] md:h-[18px]" />}
-              onClick={() => navigate('/settings')}
-              className="text-xs md:text-sm hover:bg-banana-100/60 hover:shadow-sm hover:scale-105 transition-all duration-200 font-medium"
-            >
-              <span className="hidden md:inline">{t('nav.settings')}</span>
-            </Button>
             {/* 分隔线 */}
             <div className="h-5 w-px bg-gray-300 dark:bg-border-primary mx-1" />
             {/* 语言切换按钮 */}
@@ -838,11 +777,11 @@ export const Home: React.FC = () => {
       </nav>
 
       {/* 主内容 */}
-      <main className="relative max-w-5xl mx-auto px-3 md:px-4 py-4 md:py-6">
+      <main className="relative max-w-5xl mx-auto px-2.5 sm:px-3 md:px-4 py-3 sm:py-4 md:py-6">
         {/* Hero 标题区 */}
-        <div className="text-center mb-4 md:mb-6 space-y-2 md:space-y-3">
+        <div className="text-center mb-3 sm:mb-4 md:mb-6 space-y-2 md:space-y-3">
           {/* 特性标签 */}
-          <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-2 md:gap-3">
             {[
               { icon: <Sparkles size={14} className="text-yellow-600 dark:text-banana" />, label: t('home.features.oneClick') },
               { icon: <FileEdit size={14} className="text-blue-500 dark:text-blue-400" />, label: t('home.features.naturalEdit') },
@@ -852,26 +791,26 @@ export const Home: React.FC = () => {
             ].map((feature, idx) => (
               <span
                 key={idx}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white/70 dark:bg-background-secondary backdrop-blur-sm rounded-full text-xs md:text-sm text-gray-700 dark:text-foreground-secondary border border-gray-200/50 dark:border-border-primary shadow-sm dark:shadow-none hover:shadow-md dark:hover:border-border-hover transition-all hover:scale-105 cursor-default"
+                className="inline-flex min-w-0 items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 bg-white/70 dark:bg-background-secondary backdrop-blur-sm rounded-full text-xs md:text-sm text-gray-700 dark:text-foreground-secondary border border-gray-200/50 dark:border-border-primary shadow-sm dark:shadow-none hover:shadow-md dark:hover:border-border-hover transition-all hover:scale-105 cursor-default"
               >
                 {feature.icon}
-                {feature.label}
+                <span className="truncate">{feature.label}</span>
               </span>
             ))}
           </div>
         </div>
 
         {/* 创建卡片 */}
-        <Card className="p-4 md:p-10 bg-white/90 dark:bg-background-secondary backdrop-blur-xl dark:backdrop-blur-none shadow-2xl dark:shadow-none border-0 dark:border dark:border-border-primary hover:shadow-3xl dark:hover:shadow-none transition-all duration-300 dark:rounded-2xl">
+        <Card className="p-3 sm:p-4 md:p-10 bg-white/90 dark:bg-background-secondary backdrop-blur-xl dark:backdrop-blur-none shadow-xl sm:shadow-2xl dark:shadow-none border-0 dark:border dark:border-border-primary hover:shadow-2xl sm:hover:shadow-3xl dark:hover:shadow-none transition-all duration-300 rounded-xl md:rounded-card dark:rounded-2xl">
           {/* 选项卡 */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-6 md:mb-8">
+          <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 sm:gap-4 mb-4 sm:mb-6 md:mb-8">
             {(Object.keys(tabConfig) as CreationType[]).map((type) => {
               const config = tabConfig[type];
               return (
                 <button
                   key={type}
                   onClick={() => setActiveTab(type)}
-                  className={`flex-1 flex items-center justify-center gap-1.5 md:gap-2 px-3 md:px-6 py-2.5 md:py-3 rounded-lg dark:rounded-xl font-medium transition-all text-sm md:text-base touch-manipulation ${
+                  className={`min-w-0 min-h-11 sm:flex-1 flex items-center justify-center gap-1.5 md:gap-2 px-2 sm:px-3 md:px-6 py-2.5 md:py-3 rounded-lg dark:rounded-xl font-medium transition-all text-sm md:text-base touch-manipulation ${
                     activeTab === type
                       ? 'bg-gradient-to-r from-banana-500 to-banana-600 dark:from-banana dark:to-banana text-black shadow-yellow dark:shadow-lg dark:shadow-banana/20'
                       : 'bg-white dark:bg-background-elevated border border-gray-200 dark:border-border-primary text-gray-700 dark:text-foreground-secondary hover:bg-banana-50 dark:hover:bg-background-hover active:bg-banana-100'
@@ -887,15 +826,15 @@ export const Home: React.FC = () => {
           {/* 描述 */}
           <div className="relative">
             <p className="text-sm md:text-base mb-4 md:mb-6 leading-relaxed">
-              <span className="inline-flex items-center gap-2 text-gray-600 dark:text-foreground-tertiary">
+              <span className="flex items-start gap-2 text-left text-gray-600 dark:text-foreground-tertiary">
                 <Lightbulb size={16} className="text-banana-600 dark:text-banana flex-shrink-0" />
-                <span className="font-semibold">
+                <span className="min-w-0 flex-1 font-semibold">
                   {tabConfig[activeTab].description}
                 </span>
                 {tabConfig[activeTab].example && (
-                  <span className="relative group/tip inline-flex">
+                  <span className="relative group/tip inline-flex flex-shrink-0">
                     <HelpCircle size={15} className="text-gray-400 dark:text-foreground-tertiary hover:text-banana-600 dark:hover:text-banana cursor-help transition-colors" />
-                    <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover/tip:block z-50 w-72 md:w-80 p-3 bg-white dark:bg-background-elevated border border-gray-200 dark:border-border-primary rounded-lg shadow-xl dark:shadow-none text-xs text-gray-700 dark:text-foreground-secondary whitespace-pre-line leading-relaxed">
+                    <span className="absolute right-0 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 bottom-full mb-2 hidden group-hover/tip:block z-50 w-[calc(100vw-2rem)] max-w-xs sm:w-72 md:w-80 p-3 bg-white dark:bg-background-elevated border border-gray-200 dark:border-border-primary rounded-lg shadow-xl dark:shadow-none text-xs text-gray-700 dark:text-foreground-secondary whitespace-pre-line leading-relaxed">
                       {tabConfig[activeTab].example}
                       <span className="absolute left-1/2 -translate-x-1/2 top-full -mt-px w-2 h-2 bg-white dark:bg-background-elevated border-r border-b border-gray-200 dark:border-border-primary rotate-45" />
                     </span>
@@ -911,7 +850,7 @@ export const Home: React.FC = () => {
               /* PPT 翻新：文件上传区 */
               <div className="space-y-4">
                 <div
-                  className="border-2 border-dashed border-gray-300 dark:border-border-primary rounded-xl p-8 text-center cursor-pointer hover:border-banana-400 dark:hover:border-banana transition-colors duration-200"
+                  className="border-2 border-dashed border-gray-300 dark:border-border-primary rounded-xl p-5 sm:p-8 text-center cursor-pointer hover:border-banana-400 dark:hover:border-banana transition-colors duration-200"
                   onClick={() => renovationFileInputRef.current?.click()}
                   onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                   onDrop={(e) => {
@@ -930,10 +869,10 @@ export const Home: React.FC = () => {
                   }}
                 >
                   {renovationFile ? (
-                    <div className="flex items-center justify-center gap-3">
+                    <div className="flex items-center justify-center gap-3 min-w-0">
                       <FileText size={24} className="text-banana-600 dark:text-banana" />
-                      <div className="text-left">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{renovationFile.name}</p>
+                      <div className="min-w-0 text-left">
+                        <p className="truncate text-sm font-medium text-gray-900 dark:text-white">{renovationFile.name}</p>
                         <p className="text-xs text-gray-500 dark:text-foreground-tertiary">{(renovationFile.size / 1024 / 1024).toFixed(1)} MB</p>
                       </div>
                       <button
@@ -971,8 +910,8 @@ export const Home: React.FC = () => {
                 />
 
                 {/* 保留布局 toggle */}
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2 cursor-pointer group">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <label className="flex items-center justify-between gap-2 cursor-pointer group sm:justify-start">
                     <span className="text-sm text-gray-600 dark:text-foreground-tertiary group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                       {t('home.renovation.keepLayout')}
                     </span>
@@ -991,7 +930,7 @@ export const Home: React.FC = () => {
                     onClick={handleSubmit}
                     loading={isSubmitting || isGlobalLoading}
                     disabled={!renovationFile}
-                    className="shadow-sm dark:shadow-background-primary/30 text-xs md:text-sm px-3 md:px-4"
+                    className="w-full sm:w-auto shadow-sm dark:shadow-background-primary/30 text-xs md:text-sm px-3 md:px-4"
                   >
                     {t('common.next')}
                   </Button>
@@ -1010,7 +949,7 @@ export const Home: React.FC = () => {
               rows={activeTab === 'idea' ? 4 : 8}
               className="text-sm md:text-base border-2 border-gray-200 dark:border-border-primary dark:bg-background-tertiary dark:text-white focus-within:border-banana-400 dark:focus-within:border-banana transition-colors duration-200"
               toolbarLeft={
-                <div className="flex items-center gap-1">
+                <div className="flex flex-wrap items-center gap-1">
                   <button
                     type="button"
                     onClick={handlePaperclipClick}
@@ -1092,7 +1031,7 @@ export const Home: React.FC = () => {
 
           {/* 模板选择 */}
           <div className="mb-6 md:mb-8 pt-4 border-t border-gray-100 dark:border-border-primary">
-            <div className="flex items-center justify-between mb-3 md:mb-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-3 md:mb-4">
               <div className="flex items-center gap-2">
                 <Palette size={18} className="text-orange-600 dark:text-banana flex-shrink-0" />
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">
@@ -1100,7 +1039,7 @@ export const Home: React.FC = () => {
                 </h3>
               </div>
               {/* 无模板图模式开关 */}
-              <label className="flex items-center gap-2 cursor-pointer group">
+              <label className="flex items-center justify-between gap-2 cursor-pointer group sm:justify-start">
                 <span className="text-sm text-gray-600 dark:text-foreground-tertiary group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
                   {t('home.template.useTextStyle')}
                 </span>
